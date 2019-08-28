@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.project.api.accountapilimit.mapper.AccountApiLimitMapper" >
+  <resultMap id="BaseResultMap" type="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimit" >
+    <id column="account_id" property="accountId" jdbcType="BIGINT" />
+    <id column="api_id" property="apiId" jdbcType="BIGINT" />
+    <result column="has_limit" property="hasLimit" jdbcType="BIT" />
+    <result column="limit_type" property="limitType" jdbcType="VARCHAR" />
+    <result column="limit_number" property="limitNumber" jdbcType="INTEGER" />
+    <result column="limit_time_number" property="limitTimeNumber" jdbcType="INTEGER" />
+    <result column="limit_time_unit" property="limitTimeUnit" jdbcType="VARCHAR" />
+    <result column="limit_rest_number" property="limitRestNumber" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    account_id, api_id, has_limit, limit_type, limit_number, limit_time_number, limit_time_unit, 
+    limit_rest_number, create_by, create_time, update_by, update_time, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimitExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from account_api_limit
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimitKey" >
+    select 
+    <include refid="Base_Column_List" />
+    from account_api_limit
+    where account_id = #{accountId,jdbcType=BIGINT}
+      and api_id = #{apiId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimitKey" >
+    delete from account_api_limit
+    where account_id = #{accountId,jdbcType=BIGINT}
+      and api_id = #{apiId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimitExample" >
+    delete from account_api_limit
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimit" >
+    insert into account_api_limit (account_id, api_id, has_limit, 
+      limit_type, limit_number, limit_time_number, 
+      limit_time_unit, limit_rest_number, create_by, 
+      create_time, update_by, update_time, 
+      remark)
+    values (#{accountId,jdbcType=BIGINT}, #{apiId,jdbcType=BIGINT}, #{hasLimit,jdbcType=BIT}, 
+      #{limitType,jdbcType=VARCHAR}, #{limitNumber,jdbcType=INTEGER}, #{limitTimeNumber,jdbcType=INTEGER}, 
+      #{limitTimeUnit,jdbcType=VARCHAR}, #{limitRestNumber,jdbcType=INTEGER}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimit" >
+    insert into account_api_limit
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="accountId != null" >
+        account_id,
+      </if>
+      <if test="apiId != null" >
+        api_id,
+      </if>
+      <if test="hasLimit != null" >
+        has_limit,
+      </if>
+      <if test="limitType != null" >
+        limit_type,
+      </if>
+      <if test="limitNumber != null" >
+        limit_number,
+      </if>
+      <if test="limitTimeNumber != null" >
+        limit_time_number,
+      </if>
+      <if test="limitTimeUnit != null" >
+        limit_time_unit,
+      </if>
+      <if test="limitRestNumber != null" >
+        limit_rest_number,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="accountId != null" >
+        #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="apiId != null" >
+        #{apiId,jdbcType=BIGINT},
+      </if>
+      <if test="hasLimit != null" >
+        #{hasLimit,jdbcType=BIT},
+      </if>
+      <if test="limitType != null" >
+        #{limitType,jdbcType=VARCHAR},
+      </if>
+      <if test="limitNumber != null" >
+        #{limitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="limitTimeNumber != null" >
+        #{limitTimeNumber,jdbcType=INTEGER},
+      </if>
+      <if test="limitTimeUnit != null" >
+        #{limitTimeUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="limitRestNumber != null" >
+        #{limitRestNumber,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimitExample" resultType="java.lang.Integer" >
+    select count(*) from account_api_limit
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update account_api_limit
+    <set >
+      <if test="record.accountId != null" >
+        account_id = #{record.accountId,jdbcType=BIGINT},
+      </if>
+      <if test="record.apiId != null" >
+        api_id = #{record.apiId,jdbcType=BIGINT},
+      </if>
+      <if test="record.hasLimit != null" >
+        has_limit = #{record.hasLimit,jdbcType=BIT},
+      </if>
+      <if test="record.limitType != null" >
+        limit_type = #{record.limitType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.limitNumber != null" >
+        limit_number = #{record.limitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.limitTimeNumber != null" >
+        limit_time_number = #{record.limitTimeNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.limitTimeUnit != null" >
+        limit_time_unit = #{record.limitTimeUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.limitRestNumber != null" >
+        limit_rest_number = #{record.limitRestNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.createBy != null" >
+        create_by = #{record.createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateBy != null" >
+        update_by = #{record.updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update account_api_limit
+    set account_id = #{record.accountId,jdbcType=BIGINT},
+      api_id = #{record.apiId,jdbcType=BIGINT},
+      has_limit = #{record.hasLimit,jdbcType=BIT},
+      limit_type = #{record.limitType,jdbcType=VARCHAR},
+      limit_number = #{record.limitNumber,jdbcType=INTEGER},
+      limit_time_number = #{record.limitTimeNumber,jdbcType=INTEGER},
+      limit_time_unit = #{record.limitTimeUnit,jdbcType=VARCHAR},
+      limit_rest_number = #{record.limitRestNumber,jdbcType=INTEGER},
+      create_by = #{record.createBy,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_by = #{record.updateBy,jdbcType=VARCHAR},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimit" >
+    update account_api_limit
+    <set >
+      <if test="hasLimit != null" >
+        has_limit = #{hasLimit,jdbcType=BIT},
+      </if>
+      <if test="limitType != null" >
+        limit_type = #{limitType,jdbcType=VARCHAR},
+      </if>
+      <if test="limitNumber != null" >
+        limit_number = #{limitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="limitTimeNumber != null" >
+        limit_time_number = #{limitTimeNumber,jdbcType=INTEGER},
+      </if>
+      <if test="limitTimeUnit != null" >
+        limit_time_unit = #{limitTimeUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="limitRestNumber != null" >
+        limit_rest_number = #{limitRestNumber,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where account_id = #{accountId,jdbcType=BIGINT}
+      and api_id = #{apiId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ruoyi.project.api.accountapilimit.domain.AccountApiLimit" >
+    update account_api_limit
+    set has_limit = #{hasLimit,jdbcType=BIT},
+      limit_type = #{limitType,jdbcType=VARCHAR},
+      limit_number = #{limitNumber,jdbcType=INTEGER},
+      limit_time_number = #{limitTimeNumber,jdbcType=INTEGER},
+      limit_time_unit = #{limitTimeUnit,jdbcType=VARCHAR},
+      limit_rest_number = #{limitRestNumber,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where account_id = #{accountId,jdbcType=BIGINT}
+      and api_id = #{apiId,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.project.api.server.mapper.ApiServerMapper" >
+  <resultMap id="BaseResultMap" type="com.ruoyi.project.api.server.domain.ApiServer" >
+    <id column="server_id" property="serverId" jdbcType="BIGINT" />
+    <result column="server_name" property="serverName" jdbcType="VARCHAR" />
+    <result column="server_code" property="serverCode" jdbcType="VARCHAR" />
+    <result column="server_domain" property="serverDomain" jdbcType="VARCHAR" />
+    <result column="server_port" property="serverPort" jdbcType="INTEGER" />
+    <result column="server_suffix" property="serverSuffix" jdbcType="VARCHAR" />
+    <result column="server_url" property="serverUrl" jdbcType="VARCHAR" />
+    <result column="server_auto_check" property="serverAutoCheck" jdbcType="BIT" />
+    <result column="server_check_url" property="serverCheckUrl" jdbcType="VARCHAR" />
+    <result column="server_live" property="serverLive" jdbcType="BIT" />
+    <result column="server_group" property="serverGroup" jdbcType="BIGINT" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="check_result_type" property="checkResultType" jdbcType="VARCHAR" />
+    <result column="check_type" property="checkType" jdbcType="VARCHAR" />
+    <result column="check_json_key" property="checkJsonKey" jdbcType="VARCHAR" />
+    <result column="check_value" property="checkValue" jdbcType="VARCHAR" />
+    <result column="check_cycle_minute" property="checkCycleMinute" jdbcType="INTEGER" />
+    <result column="server_weight" property="serverWeight" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    server_id, server_name, server_code, server_domain, server_port, server_suffix, server_url, 
+    server_auto_check, server_check_url, server_live, server_group, create_by, create_time, 
+    update_by, update_time, remark, check_result_type, check_type, check_json_key, check_value, 
+    check_cycle_minute, server_weight
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ruoyi.project.api.server.domain.ApiServerExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from api_server
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from api_server
+    where server_id = #{serverId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from api_server
+    where server_id = #{serverId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.ruoyi.project.api.server.domain.ApiServerExample" >
+    delete from api_server
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ruoyi.project.api.server.domain.ApiServer" useGeneratedKeys="true" keyProperty="serverId" >
+    insert into api_server (server_id, server_name, server_code, 
+      server_domain, server_port, server_suffix, 
+      server_url, server_auto_check, server_check_url, 
+      server_live, server_group, create_by, 
+      create_time, update_by, update_time, 
+      remark, check_result_type, check_type, 
+      check_json_key, check_value, check_cycle_minute, 
+      server_weight)
+    values (#{serverId,jdbcType=BIGINT}, #{serverName,jdbcType=VARCHAR}, #{serverCode,jdbcType=VARCHAR}, 
+      #{serverDomain,jdbcType=VARCHAR}, #{serverPort,jdbcType=INTEGER}, #{serverSuffix,jdbcType=VARCHAR}, 
+      #{serverUrl,jdbcType=VARCHAR}, #{serverAutoCheck,jdbcType=BIT}, #{serverCheckUrl,jdbcType=VARCHAR}, 
+      #{serverLive,jdbcType=BIT}, #{serverGroup,jdbcType=BIGINT}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR}, #{checkResultType,jdbcType=VARCHAR}, #{checkType,jdbcType=VARCHAR}, 
+      #{checkJsonKey,jdbcType=VARCHAR}, #{checkValue,jdbcType=VARCHAR}, #{checkCycleMinute,jdbcType=INTEGER}, 
+      #{serverWeight,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ruoyi.project.api.server.domain.ApiServer" useGeneratedKeys="true" keyProperty="serverId" >
+    insert into api_server
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="serverId != null" >
+        server_id,
+      </if>
+      <if test="serverName != null" >
+        server_name,
+      </if>
+      <if test="serverCode != null" >
+        server_code,
+      </if>
+      <if test="serverDomain != null" >
+        server_domain,
+      </if>
+      <if test="serverPort != null" >
+        server_port,
+      </if>
+      <if test="serverSuffix != null" >
+        server_suffix,
+      </if>
+      <if test="serverUrl != null" >
+        server_url,
+      </if>
+      <if test="serverAutoCheck != null" >
+        server_auto_check,
+      </if>
+      <if test="serverCheckUrl != null" >
+        server_check_url,
+      </if>
+      <if test="serverLive != null" >
+        server_live,
+      </if>
+      <if test="serverGroup != null" >
+        server_group,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="checkResultType != null" >
+        check_result_type,
+      </if>
+      <if test="checkType != null" >
+        check_type,
+      </if>
+      <if test="checkJsonKey != null" >
+        check_json_key,
+      </if>
+      <if test="checkValue != null" >
+        check_value,
+      </if>
+      <if test="checkCycleMinute != null" >
+        check_cycle_minute,
+      </if>
+      <if test="serverWeight != null" >
+        server_weight,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="serverId != null" >
+        #{serverId,jdbcType=BIGINT},
+      </if>
+      <if test="serverName != null" >
+        #{serverName,jdbcType=VARCHAR},
+      </if>
+      <if test="serverCode != null" >
+        #{serverCode,jdbcType=VARCHAR},
+      </if>
+      <if test="serverDomain != null" >
+        #{serverDomain,jdbcType=VARCHAR},
+      </if>
+      <if test="serverPort != null" >
+        #{serverPort,jdbcType=INTEGER},
+      </if>
+      <if test="serverSuffix != null" >
+        #{serverSuffix,jdbcType=VARCHAR},
+      </if>
+      <if test="serverUrl != null" >
+        #{serverUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="serverAutoCheck != null" >
+        #{serverAutoCheck,jdbcType=BIT},
+      </if>
+      <if test="serverCheckUrl != null" >
+        #{serverCheckUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="serverLive != null" >
+        #{serverLive,jdbcType=BIT},
+      </if>
+      <if test="serverGroup != null" >
+        #{serverGroup,jdbcType=BIGINT},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultType != null" >
+        #{checkResultType,jdbcType=VARCHAR},
+      </if>
+      <if test="checkType != null" >
+        #{checkType,jdbcType=VARCHAR},
+      </if>
+      <if test="checkJsonKey != null" >
+        #{checkJsonKey,jdbcType=VARCHAR},
+      </if>
+      <if test="checkValue != null" >
+        #{checkValue,jdbcType=VARCHAR},
+      </if>
+      <if test="checkCycleMinute != null" >
+        #{checkCycleMinute,jdbcType=INTEGER},
+      </if>
+      <if test="serverWeight != null" >
+        #{serverWeight,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ruoyi.project.api.server.domain.ApiServerExample" resultType="java.lang.Integer" >
+    select count(*) from api_server
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update api_server
+    <set >
+      <if test="record.serverId != null" >
+        server_id = #{record.serverId,jdbcType=BIGINT},
+      </if>
+      <if test="record.serverName != null" >
+        server_name = #{record.serverName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serverCode != null" >
+        server_code = #{record.serverCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serverDomain != null" >
+        server_domain = #{record.serverDomain,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serverPort != null" >
+        server_port = #{record.serverPort,jdbcType=INTEGER},
+      </if>
+      <if test="record.serverSuffix != null" >
+        server_suffix = #{record.serverSuffix,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serverUrl != null" >
+        server_url = #{record.serverUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serverAutoCheck != null" >
+        server_auto_check = #{record.serverAutoCheck,jdbcType=BIT},
+      </if>
+      <if test="record.serverCheckUrl != null" >
+        server_check_url = #{record.serverCheckUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serverLive != null" >
+        server_live = #{record.serverLive,jdbcType=BIT},
+      </if>
+      <if test="record.serverGroup != null" >
+        server_group = #{record.serverGroup,jdbcType=BIGINT},
+      </if>
+      <if test="record.createBy != null" >
+        create_by = #{record.createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateBy != null" >
+        update_by = #{record.updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.checkResultType != null" >
+        check_result_type = #{record.checkResultType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.checkType != null" >
+        check_type = #{record.checkType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.checkJsonKey != null" >
+        check_json_key = #{record.checkJsonKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.checkValue != null" >
+        check_value = #{record.checkValue,jdbcType=VARCHAR},
+      </if>
+      <if test="record.checkCycleMinute != null" >
+        check_cycle_minute = #{record.checkCycleMinute,jdbcType=INTEGER},
+      </if>
+      <if test="record.serverWeight != null" >
+        server_weight = #{record.serverWeight,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update api_server
+    set server_id = #{record.serverId,jdbcType=BIGINT},
+      server_name = #{record.serverName,jdbcType=VARCHAR},
+      server_code = #{record.serverCode,jdbcType=VARCHAR},
+      server_domain = #{record.serverDomain,jdbcType=VARCHAR},
+      server_port = #{record.serverPort,jdbcType=INTEGER},
+      server_suffix = #{record.serverSuffix,jdbcType=VARCHAR},
+      server_url = #{record.serverUrl,jdbcType=VARCHAR},
+      server_auto_check = #{record.serverAutoCheck,jdbcType=BIT},
+      server_check_url = #{record.serverCheckUrl,jdbcType=VARCHAR},
+      server_live = #{record.serverLive,jdbcType=BIT},
+      server_group = #{record.serverGroup,jdbcType=BIGINT},
+      create_by = #{record.createBy,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_by = #{record.updateBy,jdbcType=VARCHAR},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      check_result_type = #{record.checkResultType,jdbcType=VARCHAR},
+      check_type = #{record.checkType,jdbcType=VARCHAR},
+      check_json_key = #{record.checkJsonKey,jdbcType=VARCHAR},
+      check_value = #{record.checkValue,jdbcType=VARCHAR},
+      check_cycle_minute = #{record.checkCycleMinute,jdbcType=INTEGER},
+      server_weight = #{record.serverWeight,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.project.api.server.domain.ApiServer" >
+    update api_server
+    <set >
+      <if test="serverName != null" >
+        server_name = #{serverName,jdbcType=VARCHAR},
+      </if>
+      <if test="serverCode != null" >
+        server_code = #{serverCode,jdbcType=VARCHAR},
+      </if>
+      <if test="serverDomain != null" >
+        server_domain = #{serverDomain,jdbcType=VARCHAR},
+      </if>
+      <if test="serverPort != null" >
+        server_port = #{serverPort,jdbcType=INTEGER},
+      </if>
+      <if test="serverSuffix != null" >
+        server_suffix = #{serverSuffix,jdbcType=VARCHAR},
+      </if>
+      <if test="serverUrl != null" >
+        server_url = #{serverUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="serverAutoCheck != null" >
+        server_auto_check = #{serverAutoCheck,jdbcType=BIT},
+      </if>
+      <if test="serverCheckUrl != null" >
+        server_check_url = #{serverCheckUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="serverLive != null" >
+        server_live = #{serverLive,jdbcType=BIT},
+      </if>
+      <if test="serverGroup != null" >
+        server_group = #{serverGroup,jdbcType=BIGINT},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultType != null" >
+        check_result_type = #{checkResultType,jdbcType=VARCHAR},
+      </if>
+      <if test="checkType != null" >
+        check_type = #{checkType,jdbcType=VARCHAR},
+      </if>
+      <if test="checkJsonKey != null" >
+        check_json_key = #{checkJsonKey,jdbcType=VARCHAR},
+      </if>
+      <if test="checkValue != null" >
+        check_value = #{checkValue,jdbcType=VARCHAR},
+      </if>
+      <if test="checkCycleMinute != null" >
+        check_cycle_minute = #{checkCycleMinute,jdbcType=INTEGER},
+      </if>
+      <if test="serverWeight != null" >
+        server_weight = #{serverWeight,jdbcType=INTEGER},
+      </if>
+    </set>
+    where server_id = #{serverId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ruoyi.project.api.server.domain.ApiServer" >
+    update api_server
+    set server_name = #{serverName,jdbcType=VARCHAR},
+      server_code = #{serverCode,jdbcType=VARCHAR},
+      server_domain = #{serverDomain,jdbcType=VARCHAR},
+      server_port = #{serverPort,jdbcType=INTEGER},
+      server_suffix = #{serverSuffix,jdbcType=VARCHAR},
+      server_url = #{serverUrl,jdbcType=VARCHAR},
+      server_auto_check = #{serverAutoCheck,jdbcType=BIT},
+      server_check_url = #{serverCheckUrl,jdbcType=VARCHAR},
+      server_live = #{serverLive,jdbcType=BIT},
+      server_group = #{serverGroup,jdbcType=BIGINT},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR},
+      check_result_type = #{checkResultType,jdbcType=VARCHAR},
+      check_type = #{checkType,jdbcType=VARCHAR},
+      check_json_key = #{checkJsonKey,jdbcType=VARCHAR},
+      check_value = #{checkValue,jdbcType=VARCHAR},
+      check_cycle_minute = #{checkCycleMinute,jdbcType=INTEGER},
+      server_weight = #{serverWeight,jdbcType=INTEGER}
+    where server_id = #{serverId,jdbcType=BIGINT}
+  </update>
+</mapper>

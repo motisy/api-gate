@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增api')" />
+	
+	<th:block th:include="include :: select2-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-api-add">
+        	<h4 class="form-header h4">说明</h4>
+        	<div class="form-group">	
+        		<div class="col-sm-12 " style="text-align: center;">
+				api支持通配符 *，但 * 只能出现一次，并且会出现 /* 覆盖 /app/* 的情况，请注意！
+				</div>
+			</div>
+        	<h4 class="form-header h4">基本设置</h4>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label"><span style="color: red; ">*</span>api名称：</label>
+				<div class="col-sm-8">
+					<input id="apiName" name="apiName" class="form-control" type="text" required>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">api分组：</label>
+				<div class="col-sm-8">
+					<select id="apiGroupId" name="apiGroupId" class="form-control">
+						<option value="" selected>默认分组</option>
+						<option th:each="group:${groups}" th:value="${group.apiGroupId}" th:text="${group.apiGroupName}">自动检查</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" name="remark" class="form-control" th:value="*{remark}"></textarea>
+				</div>
+			</div>
+			
+			<h4 class="form-header h4">地址设置</h4>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">api地址后缀：</label>
+				<div class="col-sm-8" style="display: flex;">
+					<div class="form-control" th:text="${domian+gateurl}"></div><input id="apiUrlSuffix" name="apiUrlSuffix" class="form-control" type="text" placeholder="以'/'开头" required>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">转发地址后缀：</label>
+				<div class="col-sm-8" style="display: flex;">
+					<div class="form-control" id="apiServerUrlSuffixPre">[后端服务地址]</div><input id="apiServerUrlSuffix" name="apiServerUrlSuffix" class="form-control" type="text" placeholder="以'/'开头" required>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">请求方式：</label>
+				<div class="col-sm-8" style="display: flex;">
+					<select id="apiRequestMethod" name="apiRequestMethod" class="form-control" required>
+						<option value="GET">GET</option>
+						<option value="POST">POST</option>
+						<option value="GET/POST">GET/POST</option>
+					</select>
+				</div>
+			</div>
+			<h4 class="form-header h4">服务端设置</h4>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label"><span style="color: red; ">*</span>后端服务选择：</label>
+				<div class="col-sm-8">
+					<select id="apiServerIds" name="apiServerIds" class="form-control" required multiple="multiple">
+						<optgroup th:label="${group.key.serverGroupName}" th:each="group : ${allGroups}">
+							<option th:title="${server.serverUrl}" th:value="${server.serverId}" th:text="${server.serverName}" th:each="server : ${group.value}"></option>
+						</optgroup>
+					</select>
+				</div>
+			</div>
+			
+			<div class="form-group">	
+				<label class="col-sm-3 control-label"><span style="color: red; ">*</span>负载均衡方式(多服务器时)：</label>
+				<div class="col-sm-8">
+					<select id="apiServerRequestWay" name="apiServerRequestWay" class="form-control" required>
+						<option value="weight_round_robin">加权轮询</option>
+					</select>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <th:block th:include="include :: select2-js" />
+    
+    <script type="text/javascript">
+		var prefix = ctx + "api/apiUrl"
+		$("#form-api-add").validate({
+			rules:{
+				apiName:{
+					required:true,
+					remote: {
+                        url: prefix + "/checkNameUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                        	apiName : function() {
+                                return $.common.trim($("#apiName").val());
+                            }
+                        },
+                        dataFilter: function(data, type) {
+                        	return $.validate.unique(data);
+                        }
+                    }
+				},
+			},
+			focusCleanup: true
+		});
+		
+		$("#apiServerIds").select2({
+	        placeholder:'请选择',//默认文字提示
+	        language: "zh-CN",
+	        allowClear: true//允许清空
+	    })
+	    
+		function submitHandler() {
+			var apiUrlSuffix = $("#apiUrlSuffix").val();
+			var apiServerUrlSuffix = $("#apiServerUrlSuffix").val();
+			var apiServerIds = $("#apiServerIds").val();
+			if(apiServerIds==null || apiServerIds==''){
+				layer.msg("请选择服务器！",{icon:2});
+			}else if((apiUrlSuffix.indexOf("*")>0 && apiServerUrlSuffix.indexOf("*")<0)||
+					(apiServerUrlSuffix.indexOf("*")>0 && apiUrlSuffix.indexOf("*")<0)||
+					((apiUrlSuffix.split('*')).length-1)>1||
+					((apiServerUrlSuffix.split('*')).length-1)>1){
+				layer.msg("*匹配模式下，api地址后缀和服务器转发地址也必须添加*来匹配转发，且*只能出现一次！",{icon:2});
+			}else if($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-api-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增账号访问api的权限')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-accountApiLimit-edit" th:object="${accountApiLimit}">
+ 			<input id="accountId" name="accountId" type="hidden" th:value="*{accountId}">
+ 			<input id="apiId" name="apiId" type="hidden" th:value="*{apiId}">
+        	<div class="form-group">	
+				<label class="col-sm-3 control-label">账号：</label>
+				<div class="col-sm-8">
+					<div class="form-control" th:text="*{apiAccount.accountName}"></div>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">api：</label>
+				<div class="col-sm-8">
+					<div class="form-control" th:text="*{apiUrl.apiName+'['+apiUrl.apiUrlSuffix+']'}"></div>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" name="remark" class="form-control" th:value="*{remark}"></textarea>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">是否有限制：</label>
+				<div class="col-sm-8">
+					<select id="hasLimit" name="hasLimit" class="form-control" required>
+						<option value="">请选择</option>
+						<option value="false">无限制</option>
+						<option value="true">有限制</option>
+					</select>
+				</div>
+			</div>
+			
+			<div id="hasLimitTrueDiv">
+			</div>
+			
+			<div id="limitTypeDiv">
+			</div>
+		</form>
+	</div>
+	
+	<!-- 选择有限制时的html -->
+    <script type="html" id="hasLimitTrueHtml">
+		<h4 class="form-header h4">配置权限规则</h4>
+		<div class="form-group">	
+				<label class="col-sm-3 control-label">限制类型</label>
+				<div class="col-sm-8">
+					<select id="limitType" name="limitType" class="form-control" required>
+						<option value="">请选择</option>
+						<option value="time_limit">时间范围内限制调用次数</option>
+						<option value="total_limit">限制总调用次数</option>
+					</select>
+				</div>
+			</div>
+	</script>
+	<!-- 选择时间范围内限制调用次数时的html -->
+	<script type="html" id="timeLimitHtml">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">多长时间内：</label>
+				<div class="col-sm-8">
+					<div style="display:flex">
+					<input id="limitTimeNumber" name="limitTimeNumber" class="form-control" type="number" min="1" required>
+						
+					<select id="limitTimeUnit" name="limitTimeUnit" class="form-control" required>
+						<option value="minute">分钟</option>
+						<option value="hour">小时</option>
+						<option value="day">天</option>
+					</select>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">限制访问次数：</label>
+				<div class="col-sm-8">
+					<input id="limitNumber" name="limitNumber" class="form-control" type="text" required>
+				</div>
+			</div>
+	</script>
+	<!-- 选择限制总调用次数时的html -->
+	<script type="html" id="totalLimitHtml">
+		<div class="form-group">	
+				<label class="col-sm-3 control-label">限制访问次数：</label>
+				<div class="col-sm-8">
+					<input id="limitNumber" name="limitNumber" class="form-control" type="number" min="1" required>
+				</div>
+			</div>
+
+		<div class="form-group">	
+				<label class="col-sm-3 control-label">剩余访问次数：</label>
+				<div class="col-sm-8">
+					<input id="limitRestNumber" name="limitRestNumber" class="form-control" type="number" min="0" required>
+				</div>
+			</div>
+	</script>
+	
+    <div th:include="include::footer"></div>
+    <script th:inline="javascript">
+		var prefix = ctx + "api/accountApiLimit"
+		$("#form-accountApiLimit-edit").validate({
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+			var flag = true;
+			if($("#hasLimit").val()=='true'){
+				if($("#limitType").val()=='total_limit'){
+					if($("#limitRestNumber").val()>$("#limitNumber").val()){
+						flag = false;
+						layer.msg("剩余次数必须小于或等于限制次数", {icon:2});
+					}
+				}
+			}
+			
+			if(flag){
+				if ($.validate.form()) {
+	            	$.operate.save(prefix + "/edit", $('#form-accountApiLimit-edit').serialize());
+				}
+			}
+	    }
+		
+		$(document).on("change","#hasLimit",function(){  
+			if($("#hasLimit").val()=='true'){
+				$("#hasLimitTrueDiv").html($("#hasLimitTrueHtml").html());
+			}else if($("#hasLimit").val()=='false'){
+				$("#hasLimitTrueDiv").html("");
+			}else{
+				$("#hasLimitTrueDiv").html("");
+			}
+	    });
+		
+		$(document).on("change","#limitType",function(){  
+			if($("#limitType").val()=='time_limit'){
+				$("#limitTypeDiv").html($("#timeLimitHtml").html());
+			}else if($("#limitType").val()=='total_limit'){
+				$("#limitTypeDiv").html($("#totalLimitHtml").html());
+			}else{
+				$("#limitTypeDiv").html("");
+			}
+	    });
+		
+		//回显
+		$('#hasLimit').val("[[${accountApiLimit.hasLimit}]]").trigger('change');
+		if($("#hasLimit").val()=='true'){
+			$("#limitType").val([[${accountApiLimit.limitType}]]).trigger('change');
+			if($("#limitType").val()=='time_limit'){
+				$("#limitTimeNumber").val("[[${accountApiLimit.limitTimeNumber}]]");
+				$("#limitTimeUnit").val([[${accountApiLimit.limitTimeUnit}]]);
+				$("#limitNumber").val("[[${accountApiLimit.limitNumber}]]");
+			}
+			if($("#limitType").val()=='total_limit'){
+				$("#limitNumber").val("[[${accountApiLimit.limitNumber}]]");
+				$("#limitRestNumber").val("[[${accountApiLimit.limitRestNumber}]]");
+			}
+		}
+	</script>
+</body>
+</html>

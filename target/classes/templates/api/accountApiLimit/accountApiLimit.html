@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('账号api权限管理')" />
+</head>
+<body class="gray-bg">
+	<div class="ui-layout-center">
+		<div class="container-div">
+			<div class="row">
+		        <div class="btn-group-sm" id="toolbar" role="group">
+					<a class="btn btn-success" onclick="choseApi()">
+						<i class="fa fa-plus"></i> 添加
+					</a>
+<!-- 					<a class="btn btn-warning" onclick="exportExcel()"> -->
+<!-- 							<i class="fa fa-download"></i> 导出 -->
+<!-- 					 </a> -->
+				</div>
+				<div class="col-sm-12 select-table table-striped">
+					<table id="bootstrap-table" data-mobile-responsive="true"></table>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+    <div th:include="include :: footer"></div>
+	
+    <script th:inline="javascript">
+        var prefix = ctx + "api/accountApiLimit";
+
+        queryList();
+        
+        function queryList() {
+            var options = {
+                url: prefix + "/list?accountId="+[[${accountId}]],
+                createUrl: prefix + "/add?accountId="+[[${accountId}]],
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "账号["+[[${account.accountName}]]+"]api权限配置",
+		        showExport: true,
+                columns: [
+				{
+					field : 'accountId', 
+					title : '主键',
+					visible: false
+				},
+				{
+					field : 'apiUrl', 
+					title : 'api接口描述',
+					visible: true,
+					formatter: function(value, row, index) {
+						return value.apiName+"：<a>"+value.apiUrlSuffix+"</a>";
+		            }
+				},
+				{
+					field : 'hasLimit', 
+					title : '是否有限制',
+					sortable: true,
+					formatter: function(value, row, index) {
+						return value?"有限制":"无限制";
+		            }
+				},
+				{
+					field : 'limitType', 
+					title : '限制类型',
+					sortable: true,
+					formatter: function(value, row, index) {
+						return row.hasLimit?(value=="time_limit"?"时间范围内限制访问次数":"限制访问总次数"):"无";
+		            }
+				},
+				{
+					field : 'limitNumber', 
+					title : '限制描述',
+					sortable: true,
+					formatter: function(value, row, index) {
+						if(row.hasLimit){
+							if(row.limitType=="time_limit"){
+								var unit = row.limitTimeUnit=="minute"?"分钟":(row.limitTimeUnit=="hour"?"小时":"天");
+								return row.limitNumber+"次/"+row.limitTimeNumber+unit;
+							}else{
+								return "限制访问总次数："+row.limitNumber;
+							}
+						}else{
+							return "无";
+						}
+						return row.hasLimit?"有限制":"无限制";
+		            }
+				},
+				{
+					field : 'limitRestNumber', 
+					title : '剩余调用次数',
+					sortable: true,
+					formatter: function(value, row, index) {
+						if(row.hasLimit){
+							return value;
+						}else{
+							return "无限制";
+						}
+		            }
+				},
+				{
+					field : 'remark', 
+					title : '备注',
+					formatter: function(value, row, index) {
+						if(value!=null && value.length>15){
+							value = "<span title='"+value+"'>"+value.substring(0,15)+"。。。</span>";
+						}
+						return value;
+		            }
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="edit(\'' + row.accountId + '\',\'' + row.apiId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="remove(\'' + row.accountId + '\',\'' + row.apiId + '\')"><i class="fa fa-remove"></i>删除</a>');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        }
+         
+        function choseApi(){
+        	var accountName = [[${account.accountName}]];
+        	var accountId = [[${accountId}]];
+//         	(title, url, width, height, callback)
+        	$.modal.open("请为api账号["+accountName+"]选择可以使用的api接口，当前账号已授权的接口将不会出现在此列表中！", ctx + "api/accountApiLimit/choseApi?accountId="+accountId, document.body.clientWidth*0.8, document.body.clientHeight*0.8);
+        }
+        
+        function exportExcel(){
+        	var accountId = [[${accountId}]];
+        	$.modal.confirm("确定导出账号"+[[${account.accountName}]]+"的api权限吗？", function() {
+    			$.modal.loading("正在导出数据，请稍后...");
+    			$.post(ctx + "api/accountApiLimit/export?accountId="+accountId, {}, function(result) {
+    				if (result.code == web_status.SUCCESS) {
+    			        window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+    				} else if (result.code == web_status.WARNING) {
+                        $.modal.alertWarning(result.msg)
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+			});
+        }
+        
+        function edit(accountId, apiId){
+        	$.modal.open("修改账号["+[[${account.accountName}]]+"]api权限配置", prefix + "/edit?accountId="+accountId+"&apiId="+apiId);
+        }
+        function remove(accountId, apiId){
+        	$.modal.open("修改账号["+[[${account.accountName}]]+"]api权限配置", prefix + "/edit?accountId="+accountId+"&apiId="+apiId);
+        	$.modal.confirm("确定删除该条信息吗？", function() {
+                var url = prefix + "/remove?accountId="+accountId+"&apiId="+apiId;
+                $.operate.get(url);
+        	});
+        }
+    </script>
+</body>
+</html>

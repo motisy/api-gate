@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: API
+Implementation-Version: 1.0.0
+Built-By: Administrator
+Implementation-Vendor-Id: com.lglitter
+Build-Jdk: 1.8.0_201
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/API
+Created-By: Maven Integration for Eclipse
+
