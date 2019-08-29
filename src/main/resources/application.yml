@@ -1,13 +1,13 @@
 # 项目相关配置
 ruoyi:
   # 名称
-  name: lg API
+  name: API
   # 版本
   version: 1.0.0
   # 版权年份
   copyrightYear: 2019
   # 实例演示开关
-  demoEnabled: true
+  demoEnabled: false
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
   profile: D:/api/uploadPath
   # 获取ip地址开关
@@ -61,9 +61,9 @@ spring:
   servlet:
      multipart:
        # 单个文件大小
-       max-file-size:  10MB
+       max-file-size:  100MB
        # 设置总上传的文件大小
-       max-request-size:  20MB
+       max-request-size:  200MB
   # 服务模块
   devtools:
     restart:
@@ -139,6 +139,10 @@ shiro:
     maxSession: -1
     # 踢出之前登录的/之后登录的用户，默认踢出之前登录的用户
     kickoutAfter: false
+ #不进行拦截的地址
+  notIntercept: 
+    urlPattern: /api/test/**,/api/show,/api/show/params
+    
 
 # 防止XSS攻击
 xss: 
@@ -162,5 +166,7 @@ gen:
   
 openapi: 
   domain: http://localhost:80
+  #这个一定要有，请求api时的地址为domain+preurl+apiUrl，这样做是为了防止与项目本身的url冲突
   preurl: /openapi
+ #md5加密用的key，随便填
   md5key: www.lgjtgs.com

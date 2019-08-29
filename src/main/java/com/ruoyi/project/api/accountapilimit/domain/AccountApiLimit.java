@@ -43,6 +43,8 @@ public class AccountApiLimit extends BaseEntity {
     private ApiAccount apiAccount;
     private ApiUrl apiUrl;
     
+    private String des;
+    
     public ApiAccount getApiAccount() {
     	if(accountId!=null) {
     		this.apiAccount = SpringUtils.getBean(IApiAccountService.class).selectByPrimaryKey(accountId);
@@ -156,5 +158,27 @@ public class AccountApiLimit extends BaseEntity {
 
 	public void setLimitRestNumber(Integer limitRestNumber) {
 		this.limitRestNumber = limitRestNumber;
+	}
+
+	public String getDes() {
+		if(this.des == null) {
+			if(hasLimit) {
+				if(limitType.equals("time_limit")) {
+//					minute/hour/day
+					String unit = this.limitTimeUnit.equals("minute")?"分钟":(this.limitTimeUnit.equals("hour")?"小时":"天");
+					this.des = this.limitNumber+"次/" + this.limitTimeNumber + unit;
+				}else {
+					this.des = "总访问次数为"+this.limitTimeNumber+"次";
+				}
+			}else {
+				this.des = "无限制";
+			}
+			
+		}
+		return des;
+	}
+
+	public void setDes(String des) {
+		this.des = des;
 	}
 }

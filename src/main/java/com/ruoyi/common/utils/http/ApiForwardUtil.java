@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.ruoyi.common.constant.AjaxResultType;
 import com.ruoyi.common.constant.ApiErrorResponseConstants;
 import com.ruoyi.common.exception.ApiException;
 import com.ruoyi.common.utils.loadbalance.LoadBanlanceUtil;
@@ -96,7 +97,12 @@ public class ApiForwardUtil {
                 HttpEntity entity = response.getEntity();
                 fileHandle(entity, out);
             } else {
-                httpServletResponse.sendError(response.getStatusLine().getStatusCode());
+//                httpServletResponse.sendError(response.getStatusLine().getStatusCode());
+                String resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
+//                ApiErrorResponseConstants.FORWARD_ERROR(httpServletResponse, resultString);
+                ApiErrorResponseConstants.response(httpServletResponse, resultString, null, "转发失败", AjaxResultType.ERROR);
+                recordMap.put("forwardSuccess", false);
+	        	recordMap.put("failedReasons", resultString);
             }
             recordMap.put("forwardSuccess", true);
         } catch (Exception e) {

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('api参数')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 select-table table-bordered">
+				<table id="bootstrap-table" data-mobile-responsive="true" class="table table-hover" style="margin-top: 20px;">
+					<thead>
+						<tr>
+							<th style="text-align: center; " colspan="4" tabindex="0">
+								<div class="th-inner" th:text="'api['+${api.apiName}+']['+${api.apiUrlSuffix}+']的参数信息'">api信息</div>
+								<div class="fht-cell"></div>
+							</th>
+						</tr>
+						<tr>
+							<th style="" data-field="userId" tabindex="0">
+								<div class="th-inner ">参数名称</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userCode" tabindex="0">
+								<div class="th-inner ">必选参数</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userName" tabindex="0">
+								<div class="th-inner ">数据类型</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userPhone" tabindex="0">
+								<div class="th-inner ">正则匹配</div>
+								<div class="fht-cell"></div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-index="0" th:each="p:${apiParams}">
+							<td style="" th:text="${p.paramName}">1</td>
+							<td style="" th:utext="${p.paramRequired?'<strong>必须</strong>':'可选'}">1000001</td>
+							<td style="" th:text="${p.paramType}">测试1</td>
+							<td style="" th:text="${p.paramCheckRegex}">测试1</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+</body>
+</html>

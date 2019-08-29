@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('api信息')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 select-table table-bordered">
+				<table id="bootstrap-table" data-mobile-responsive="true" class="table table-hover" style="margin-top: 20px;">
+					<thead>
+						<tr>
+							<th style="text-align: center; " th:colspan="${account!=null?7:6}" tabindex="0">
+								<div class="th-inner " th:text="${account!=null?account.accountName+'['+account.appKey+']的api权限':'api信息'}">api信息</div>
+								<div class="fht-cell"></div>
+							</th>
+						</tr>
+						<tr>
+							<th style="" data-field="userId" tabindex="0">
+								<div class="th-inner ">分组</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userCode" tabindex="0">
+								<div class="th-inner ">api名称</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userName" tabindex="0">
+								<div class="th-inner ">请求方式</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userPhone" tabindex="0">
+								<div class="th-inner ">请求地址</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userPhone" tabindex="0">
+								<div class="th-inner ">备注</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th th:if="${account!=null}" style="" data-field="userPhone" tabindex="0">
+								<div class="th-inner ">限制</div>
+								<div class="fht-cell"></div>
+							</th>
+							<th style="" data-field="userPhone" tabindex="0">
+								<div class="th-inner ">参数</div>
+								<div class="fht-cell"></div>
+							</th>
+						</tr>
+					</thead>
+					<tbody th:each="group:${groups}">
+						<tr data-index="0" th:each="api,stat:${group.value}">
+							<td style="" th:text="${group.key}" th:if="${stat.index==0}" th:rowspan="${stat.index==0?group.value.size():1}">1</td>
+							<td style="" th:text="${api.apiName}">1000001</td>
+							<td style="" th:text="${api.apiRequestMethod}">测试1</td>
+							<td style=""> <a th:text="${api.requestUrl}" href="javascript:void(0);"></a></td>
+							<td style="" th:title="${api.remark}" th:text="${#strings.abbreviate(api.remark,10)}">ry@qq.com</td>
+							<td style="" th:if="${api.limit!=null}" th:text="${api.limit.des}">ry@qq.com</td>
+							<td style=""> <a th:if="${!#strings.contains(api.apiUrlSuffix,'*')}" th:href="'javascript:showParam('+${api.apiId}+');'">查看参数</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+<!-- 		</div> -->
+		
+<!-- 		<div class="row"> -->
+			<div class="col-sm-12 search-collapse">
+			    <p class="select-title">查询账号权限</p>
+				<form id="ordinary-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								appKey：<input type="text" name="appKey" id="appKey" th:value="${account!=null?account.appKey:''}"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchAppKey()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="resetAppKey()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    
+    <script type="text/javascript">
+    function searchAppKey(){
+    	location.href=ctx+"api/show?appKey="+$.trim($("#appKey").val());
+    }
+    function resetAppKey(){
+    	location.href=ctx+"api/show";
+    }
+    function showParam(apiId){
+    	layer.open({
+    		type: 2,
+    		area: ['800px', ($(window).height() - 200)+'px'],
+    		fix: false,
+    		//不固定
+    		maxmin: true,
+    		shade: 0.3,
+    		title: "api参数",
+    		content: ctx+"api/show/params?apiId="+apiId,
+    		btn: ['关闭'],
+    	    // 弹层外区域关闭
+    		shadeClose: true,
+    	    cancel: function(index) {
+    	        return true;
+    	    }
+    	});
+    }
+    </script>
+</body>
+</html>

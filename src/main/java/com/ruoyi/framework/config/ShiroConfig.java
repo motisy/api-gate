@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -97,6 +98,10 @@ public class ShiroConfig
     // 权限认证失败地址
     @Value("${shiro.user.unauthorizedUrl}")
     private String unauthorizedUrl;
+    
+  //不需要拦截的请求，不登录就可以直接访问
+  	@Value("#{'${shiro.notIntercept.urlPattern}'.split(',')}")
+  	private List<String> notIntercept;
     
     @Autowired
     private ApiConfig apiConfig;
@@ -259,8 +264,6 @@ public class ShiroConfig
         filterChainDefinitionMap.put("/ruoyi/**", "anon");
         filterChainDefinitionMap.put("/druid/**", "anon");
         filterChainDefinitionMap.put("/captcha/captchaImage**", "anon");
-        filterChainDefinitionMap.put("/api/test/**", "anon");
-        
         
         //api请求放行
         filterChainDefinitionMap.put(apiConfig.getPreurl()+"/**", "anon");
@@ -273,6 +276,10 @@ public class ShiroConfig
         // 系统权限列表
         // filterChainDefinitionMap.putAll(SpringUtils.getBean(IMenuService.class).selectPermsAll());
 
+        for(String anon:notIntercept) {
+            filterChainDefinitionMap.put(anon, "anon");
+        }
+        
         Map<String, Filter> filters = new LinkedHashMap<String, Filter>();
         filters.put("onlineSession", onlineSessionFilter());
         filters.put("syncOnlineSession", syncOnlineSessionFilter());

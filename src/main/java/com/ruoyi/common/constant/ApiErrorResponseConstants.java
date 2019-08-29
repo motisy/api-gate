@@ -46,12 +46,22 @@ public class ApiErrorResponseConstants {
 		return response(response, message, "未找到服务器", AjaxResultType.ERROR);
 	}
 	
+	public final static Boolean FORWARD_ERROR(HttpServletResponse response, String message) {
+		return response(response, message, "转发失败", AjaxResultType.ERROR);
+	}
+	
 	public final static Boolean ERROR(HttpServletResponse response, String message) {
 		return response(response, message, "系统错误", AjaxResultType.ERROR);
 	}
 	
 	public final static Boolean response(HttpServletResponse response, String message, String defaultMessage, AjaxResultType type) {
 		AjaxResult result = new AjaxResult(type, StringUtils.isNotBlank(message)?message:defaultMessage, null);
+		JSONObject jsonObj = (JSONObject) JSON.toJSON(result);
+		return reponseJson(response, jsonObj);
+	}
+	
+	public final static Boolean response(HttpServletResponse response, Object data, String message, String defaultMessage, AjaxResultType type) {
+		AjaxResult result = new AjaxResult(type, StringUtils.isNotBlank(message)?message:defaultMessage, data);
 		JSONObject jsonObj = (JSONObject) JSON.toJSON(result);
 		return reponseJson(response, jsonObj);
 	}

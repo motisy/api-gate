@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-	<th:block th:include="include :: header('基本表单')" />
+	<th:block th:include="include :: header('api测试')" />
 </head>
 <body class="gray-bg">
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -45,6 +45,17 @@
                                     <select v-model="requestMethod" class="form-control m-b" name="requestMethod" id="requestMethod">
                                         <option value="GET">GET</option>
                                         <option value="POST">POST</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">返回结果预测</label>
+
+                                <div class="col-sm-10" id="resultType">
+                                    <select v-model="resultType" class="form-control m-b" name="resultType" id="resultType">
+                                        <option value="json">json数据</option>
+                                        <option value="file">文件(图片/文档/音视频等)</option>
                                     </select>
                                 </div>
                             </div>
@@ -93,7 +104,7 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-primary" type="button" @click="submit">保存内容</button>
+                                    <button class="btn btn-primary" type="button" @click="submit">提交</button>
 <!--                                     <button class="btn btn-white" type="submit">取消</button> -->
                                 </div>
                             </div>
@@ -146,8 +157,9 @@
     var vm = new Vue({
 		el: '#app',
    		data: {
+   			resultType: 'json',
    			apiUrl1: 'http://localhost/openapi',
-   			apiUrl2: '/',
+   			apiUrl2: '',
    			appKey: '1hGBBbzU0F',
    			appScrect: 'e9d2b3c9c04109e5ae5ffe8a8697c8c2',
    			requestMethod: 'GET',
@@ -190,17 +202,22 @@
 	     	submit: function(){
 	     		var that = this;
 	     		if(that.requestMethod=="GET"){
-			        $.ajax({
-			        	url: that.apiUrl,
-						type: "GET",
-			            data:$('#form').serialize(), // "id=asdasd&s=000&name=1233"
-			            success:function (data,status,xhr) {
-							$("#result").html(JSON.stringify(data, null, "\t"))
-						},
-						error:function (data) {
-							$("#result").html(JSON.stringify(data, null, "\t"))
-						}
-			        })
+			        if(that.resultType=="json"){
+			        	$.ajax({
+				        	url: that.apiUrl,
+							type: "GET",
+				            data:$('#form').serialize(), // "id=asdasd&s=000&name=1233"
+				            success:function (data,status,xhr) {
+								$("#result").html(JSON.stringify(data, null, "\t"))
+							},
+							error:function (data,status,xhr) {
+								$("#result").html(JSON.stringify(data, null, "\t"))
+							}
+				        })
+			        }else{
+			        	$('#form').attr("action",that.apiUrl);
+			        	$('#form').submit();
+			        }
 	     		}else{
 	     			var formData = new FormData(document.querySelector("#form"));
 			        $.ajax({
