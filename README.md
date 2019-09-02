@@ -1,5 +1,5 @@
 # api-gate
-一个api网关项目，可以当做api开放平台或外网转内网的转发工具 ，
+一个api网关项目，可以当做api开放平台或外网转内网的转发工具，基于httpclient4.5  
 1、项目基于ruoyi搭建：http://www.ruoyi.vip  
 2、基于appKey+appSecret的账号  
 3、api支持通配符匹配  
