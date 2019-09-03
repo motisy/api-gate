@@ -217,6 +217,10 @@ public class ApiRequestInterceptor extends HandlerInterceptorAdapter  {
 	 * @return 匹配到的api后缀，未匹配到就返回null
 	 */
 	public String hasApi(String requestUrl) {
+		if(StringUtils.isBlank(requestUrl)) {
+			return null;
+		}
+		
 		Set<Object> ss = redisUtil.ZGet(ApiRedisConstants.API_URL_SORT);
 		
 //		Set<Object> sortSet = new TreeSet<Object>(new Comparator<Object>() {
