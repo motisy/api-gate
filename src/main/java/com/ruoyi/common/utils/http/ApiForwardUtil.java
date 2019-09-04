@@ -1,6 +1,7 @@
 package com.ruoyi.common.utils.http;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.List;
@@ -27,6 +28,10 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +46,9 @@ import com.ruoyi.project.api.account.domain.ApiAccount;
 import com.ruoyi.project.api.apiurl.domain.ApiUrl;
 import com.ruoyi.project.api.server.domain.ApiServer;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class ApiForwardUtil {
 
@@ -68,38 +76,59 @@ public class ApiForwardUtil {
 	        //如果是*匹配模式，替换为真实请求，逻辑为将requestUrI中*之后的替换到后端请求中
 	        if(apiUrl.getApiUrlSuffix().indexOf("*")>0) {
 	        	String apiUrlSuffix = apiUrl.getApiUrlSuffix();
-	            String apiUrlSuffixBeforeWildcard = apiUrlSuffix.substring(0, apiUrlSuffix.indexOf("*"));
-	            
-	            String realRequestSuffix = requestUrI.replace(apiConfig.getPreurl(), "");
-	            realRequestSuffix = realRequestSuffix.substring(realRequestSuffix.indexOf(apiUrlSuffixBeforeWildcard)+1, realRequestSuffix.length());
-	            uri = uri.replace("*", realRequestSuffix);
+	        	
+	        	String requestApi = requestUrI.replace(apiConfig.getContextPath(), "").replace(apiConfig.getPreurl(), "");
+	        	if(apiUrlSuffix.replace("/*", "").equals(requestApi)) {
+	        		uri = uri.replace("/*", "");
+	        	}else {
+	        		apiUrlSuffix = StringUtils.isBlank(apiConfig.getContextPath())?(apiConfig.getPreurl()+apiUrlSuffix):(apiConfig.getContextPath()+apiConfig.getPreurl()+apiUrlSuffix);
+		        	apiUrlSuffix = apiUrlSuffix.replace("*", "");
+		        	String match = requestUrI.replace(apiUrlSuffix, "");
+		        	
+		            uri = uri.replace("*", "");
+		            uri = uri + match;
+	        	}
 	        }
-	        
 	        recordMap.put("forwardUrl", uri);
 	        CloseableHttpClient httpclient = httpConnectionPool.getHttpClient();
 	        String reqMethod = recordMap.get("requestMethod").toString();
 	        
 	        //转发请求
 	     // 检测是否为多媒体上传
+	        String appKey = params.get("appKey");
+	        String appScrect = params.get("appScrect");
+	        
  			if (!ServletFileUpload.isMultipartContent(httpServletRequest)) {
  				response = normalRequest(recordMap, reqMethod, uri, httpServletRequest, response, httpclient);
  			}else {
+ 				params.remove("appKey");
+ 				params.remove("appScrect");
  				response = multiPartRequest(recordMap, fileNames, params, uri, httpServletRequest, response, httpclient);
  			}
 	        
 	        // 目前只测试了html，js，css，png  其他返回类型还要测试
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                //处理响应
+            	log.info("转发成功");
+            	//处理响应
+            	httpServletResponse.setStatus(HttpStatus.SC_OK);
                 doResponse(httpServletResponse, response);
-                recordMap.put("responseContentType", response.getFirstHeader("Content-Type").getValue());
+                String responseContentType = response.getFirstHeader("Content-Type").getValue();
+                recordMap.put("responseContentType", responseContentType);
                 //处理响应结果
-                ServletOutputStream out = httpServletResponse.getOutputStream();
                 HttpEntity entity = response.getEntity();
-                fileHandle(entity, out);
+                
+                if(responseContentType.contains("text/html")) {
+                	log.info("返回html");
+                	String path = apiConfig.getContextPath()+ apiConfig.getPreurl()+apiUrl.getApiUrlSuffix().replace("*", "");
+                	htmlHandle(httpServletResponse, response, path, appKey, appScrect);
+                }else {
+                	log.info("非html");
+                	fileHandle(entity, httpServletResponse.getOutputStream());
+                }
+                
             } else {
-//                httpServletResponse.sendError(response.getStatusLine().getStatusCode());
+            	log.info("转发失败");
                 String resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-//                ApiErrorResponseConstants.FORWARD_ERROR(httpServletResponse, resultString);
                 ApiErrorResponseConstants.response(httpServletResponse, resultString, null, "转发失败", AjaxResultType.ERROR);
                 recordMap.put("forwardSuccess", false);
 	        	recordMap.put("failedReasons", resultString);
@@ -167,6 +196,7 @@ public class ApiForwardUtil {
 	        httpPost.setEntity(entity);
 	        response = httpclient.execute(httpPost);// 执行提交
 		} catch (Exception e) {
+			log.error("转发出错了");
             throw new ApiException(e.getMessage(), e);
 		}
         
@@ -193,6 +223,8 @@ public class ApiForwardUtil {
 			    HttpPost httpPost = new HttpPost(uri);
 
 			    //将前台的请求体放到我的请求体里
+			    httpServletRequest.removeAttribute("appKey");
+			    httpServletRequest.removeAttribute("appScrect");
 			    httpPost.setEntity(new InputStreamEntity(httpServletRequest.getInputStream()));
 
 			    response = httpclient.execute(httpPost);
@@ -203,13 +235,17 @@ public class ApiForwardUtil {
 			    //将前台的参数放到我的请求里
 			    while (enumeration.hasMoreElements()) {
 			        String next = enumeration.nextElement();
-			        builder.setParameter(next, httpServletRequest.getParameter(next));
+			        if(!next.equals("appKey") && !next.equals("appScrect")) {
+				        builder.setParameter(next, httpServletRequest.getParameter(next));
+			        }
 			    }
 			    HttpGet httpGet = new HttpGet(builder.build());
+			    log.info("真实转发地址为："+builder.toString());
 
 			    response = httpclient.execute(httpGet);
 			}
 		} catch (Exception e) {
+			log.error("转发出错了");
             throw new ApiException(e.getMessage(), e);
 		}
         
@@ -236,7 +272,11 @@ public class ApiForwardUtil {
         }
     }
 
-    //非html直接返回
+    /**
+     * 非html直接返回
+     * @param entity
+     * @param out
+     */
     public void fileHandle(HttpEntity entity, ServletOutputStream out) {
         try {
             entity.writeTo(out);
@@ -251,6 +291,96 @@ public class ApiForwardUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+    
+    /**
+     * 处理html
+     * @param response
+     * @param closeableHttpResponse
+     */
+    public void htmlHandle(HttpServletResponse httpServletResponse, CloseableHttpResponse closeableHttpResponse, String path, String appKey, String appScrect) {
+        try {
+            String html = EntityUtils.toString(closeableHttpResponse.getEntity());  //将返回的html转换为字符
+            //将html内资源地址一并修改
+            String res = htmlConvert(html, path, appKey, appScrect);  //处理html
+            PrintWriter writer = httpServletResponse.getWriter();  //获得返回流
+            writer.print(res);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * 处理html数据里的 js，css，png等的链接地址
+     * 方便后面进行转发
+     *
+     * @param html
+     * @return
+     */
+    String htmlConvert(String html, String path, String appKey, String appScrect) {
+        String path2 = "";
+    	if(path.endsWith("/")) {
+    		path2 = path;
+    		path = path.substring(0,path.length()-1);
+        }else {
+        	path2 = path+"/";
+        }
+
+    	String ss = path.replace(apiConfig.getContextPath(), "").replace(apiConfig.getPreurl(), "").substring(1);
+
+        Document doc = Jsoup.parse(html);
+
+        Elements a = doc.select("[href~=#]");
+        for (Element e : a) {
+            e.removeAttr("href");
+        }
+
+
+        // 找到所有包含src属性，但是链接不以http开头的元素
+        Elements src = doc.select("[src~=^(?!http).*$]");
+        Elements href = doc.select("[href~=^(?!(http|#)).*$]");
+        Elements action = doc.select("[action]");
+
+        for (Element e : src) {
+            replaceLink("src", e, path, path2, ss, appKey, appScrect);
+        }
+        for (Element e : href) {
+        	replaceLink("href", e, path, path2, ss, appKey, appScrect);
+        }
+        for (Element e : action) {
+            replaceLink("action", e, path, path2, ss, appKey, appScrect);
+        }
+
+        return doc.outerHtml();
+    }
+    
+    private void replaceLink(String attr, Element e, String path, String path2, String apiUrl, String appKey, String appScrect) {
+    	String link = e.attr(attr);
+        if(link.startsWith(apiUrl)) {
+        	link = link.substring(apiUrl.length());
+        }
+        if(link.startsWith("/"+apiUrl)) {
+        	link = link.substring(("/"+apiUrl).length());
+        }
+        if (link.startsWith("/")) {
+        	String s = path + link;
+        	if(!s.contains("?")) {
+        		link = path + link + "?appKey="+appKey+"&appScrect="+appScrect;
+        	}else {
+        		link = path + link + "&appKey="+appKey+"&appScrect="+appScrect;
+        	}
+            e.attr(attr, link);
+        } else {
+        	String s = path + link;
+        	if(!s.contains("?")) {
+        		link = path2 + link + "?appKey="+appKey+"&appScrect="+appScrect;
+        	}else {
+        		link = path2 + link + "&appKey="+appKey+"&appScrect="+appScrect;
+        	}
+            e.attr(attr, link);
         }
     }
     
@@ -290,5 +420,4 @@ public class ApiForwardUtil {
         }
         return resultString;
     }
-
 }

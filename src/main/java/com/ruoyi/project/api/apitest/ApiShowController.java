@@ -2,7 +2,9 @@ package com.ruoyi.project.api.apitest;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.framework.config.ApiConfig;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 
@@ -26,9 +29,13 @@ public class ApiShowController extends BaseController
 {
     private String prefix = "api/test";
 
+    @Autowired
+    private ApiConfig apiConfig;
+    
     @GetMapping()
-    public String operlog()
+    public String operlog(ModelMap map)
     {
+    	map.put("url1", apiConfig.getDomain()+apiConfig.getPreurl());
         return prefix + "/test";
     }
     

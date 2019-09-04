@@ -40,6 +40,9 @@ import com.ruoyi.project.api.apiurl.domain.ApiUrlParam;
 import com.ruoyi.project.api.apiurl.service.IApiUrlService;
 import com.ruoyi.project.api.record.service.IApiRequestRecordService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class ApiRequestInterceptor extends HandlerInterceptorAdapter  {
 
@@ -82,7 +85,14 @@ public class ApiRequestInterceptor extends HandlerInterceptorAdapter  {
 		long startTime = System.currentTimeMillis();
 		try {
 			//请求地址
-			String requestUrl = request.getRequestURI().replace(apiConfig.getPreurl(), "");
+			String requestUrl = request.getRequestURI();
+			if(StringUtils.isNoneBlank(apiConfig.getContextPath())) {
+				requestUrl = requestUrl.replace(apiConfig.getContextPath(), "");
+			}
+			if(StringUtils.isNoneBlank(apiConfig.getPreurl())) {
+				requestUrl = requestUrl.replace(apiConfig.getPreurl(), "");
+			}
+			
 			ApiUrl apiUrl = null;
 			ApiAccount account = new ApiAccount();
 			
@@ -166,6 +176,7 @@ public class ApiRequestInterceptor extends HandlerInterceptorAdapter  {
 			
 			
 			//转发请求
+			log.info("请求："+request.getRequestURL());
 			forwarded = true;
 			apiForwardUtil.forward(recordMap, fileNames, params, request, response, apiUrl, account);
 		} catch (Exception e) {
@@ -220,7 +231,6 @@ public class ApiRequestInterceptor extends HandlerInterceptorAdapter  {
 		if(StringUtils.isBlank(requestUrl)) {
 			return null;
 		}
-		
 		Set<Object> ss = redisUtil.ZGet(ApiRedisConstants.API_URL_SORT);
 		
 //		Set<Object> sortSet = new TreeSet<Object>(new Comparator<Object>() {
@@ -237,6 +247,10 @@ public class ApiRequestInterceptor extends HandlerInterceptorAdapter  {
 			//匹配*模式
 			for(Object s:ss) {
 				if(s.toString().indexOf("*")>0) {
+					//看是不是直接访问没有后缀
+					if(s.toString().substring(0, s.toString().length()-2).equals(requestUrl)) {
+						return s.toString();
+					}
 					if(wildcardMatch(requestUrl.toCharArray(), s.toString().toCharArray())) {
 						return s.toString();
 					}

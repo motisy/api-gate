@@ -149,7 +149,7 @@
     
     <script th:src="@{/js/vue.min.js}"></script>
     
-    <script type="text/javascript">
+   <script th:inline="javascript">
     $(function(){ 
     	$("#result").height($(window).height()-130);
 	}); 
@@ -158,7 +158,7 @@
 		el: '#app',
    		data: {
    			resultType: 'json',
-   			apiUrl1: 'http://localhost/openapi',
+   			apiUrl1: [[${url1}]],
    			apiUrl2: '',
    			appKey: '1hGBBbzU0F',
    			appScrect: 'e9d2b3c9c04109e5ae5ffe8a8697c8c2',
